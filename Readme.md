@@ -1,5 +1,7 @@
 # Webex-Teams-CLI - A CLI tool to send messages to / interact with Cisco Webex Teams.
 
+![WebEx Screenshot](https://raw.githubusercontent.com/tejzpr/webex-teams-cli/main/screenshots/webex-1.png)
+
 1. Send messages to webex teams on remote system events
 2. Send message to webex periodically via cronjob
 3. Use a custom bot to update room on a Jenkins event.

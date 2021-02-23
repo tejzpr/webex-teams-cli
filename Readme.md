@@ -190,8 +190,8 @@ To send a file via console prompt use the **sendfile** command
 ```
 <- (email@email.com): sendfile <file-path or URI>
 ```
-## Create a server similar to eurl.io
-Create a server which can add users to a Webex Teams room similar to eurl.io. The user to be added is retrieved via the header **auth_user**
+## Create Webex Room Onboarding Server
+Create a server which can onboard users to a Webex Teams room. The user to be added is retrieved via the header **auth_user**
 The email address of the user is constructed using a combination of auth_user & the emaildomain flag. The server's default port is **8000** and it can be changed by using the -p flag
 ```
 webex-teams-cli adduserserver -emaildomain email.com

@@ -45,13 +45,13 @@ func (app *Application) AddUserToRoomServer() *cli.Command {
 			port := c.Int64("port")
 			emaildomain := c.String("emaildomain")
 
-			eurlApp := &AddUserToRoomServerApplication{Application: app, EmailDomain: emaildomain}
+			onboardApp := &AddUserToRoomServerApplication{Application: app, EmailDomain: emaildomain}
 			r := chi.NewRouter()
 			r.Use(middleware.RequestID)
 			r.Use(middleware.Logger)
 			r.Use(middleware.Recoverer)
-			r.Get("/", eurlApp.index)
-			r.Get("/{webexroom}", eurlApp.addUser)
+			r.Get("/", onboardApp.index)
+			r.Get("/{webexroom}", onboardApp.addUser)
 
 			log.Println(fmt.Sprintf("Started server on :%d", port))
 			http.ListenAndServe(fmt.Sprintf(":%d", port), r)

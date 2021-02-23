@@ -47,7 +47,7 @@ func main() {
 
 		webex-teams-cli room msg -t "message text" -f <file>
 		`,
-		Version: "v0.1b",
+		Version: "v1.0",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "accessToken",

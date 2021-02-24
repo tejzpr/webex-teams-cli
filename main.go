@@ -106,7 +106,9 @@ func main() {
 			if _, err := os.Stat(absFilePath); os.IsNotExist(err) {
 				os.Mkdir(absFilePath, 0766)
 			}
-
+			if err != nil {
+				return err
+			}
 			appWebex.DownloadsDir = downloadsDir
 
 			return nil

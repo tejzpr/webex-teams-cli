@@ -109,7 +109,10 @@ func (app *Application) SendMessage2Room(params *SendMessageParams) (*webexteams
 				Transport: netTransport,
 			}
 
-			req, _ := http.NewRequest("GET", params.Filename, nil)
+			req, err := http.NewRequest("GET", params.Filename, nil)
+			if err != nil {
+				return nil, err
+			}
 			baseFileName := path.Base(req.URL.Path)
 			fileExt := path.Ext(req.URL.Path)
 			fileID := baseFileName[0 : len(baseFileName)-len(fileExt)]
@@ -123,7 +126,9 @@ func (app *Application) SendMessage2Room(params *SendMessageParams) (*webexteams
 			}
 
 			resp, err := ioutil.ReadAll(httpResponse.Body)
-
+			if err != nil {
+				return nil, err
+			}
 			_ = httpResponse.Body.Close()
 
 			mime := mimetype.Detect(resp)

@@ -1,13 +1,19 @@
 # Webex-Teams-CLI - A CLI tool to send messages to / interact with Cisco Webex Teams.
 
-![WebEx Screenshot](https://raw.githubusercontent.com/tejzpr/webex-teams-cli/main/screenshots/webex-1.png)
+## The What?
+Webex Teams CLI is a versatile tool that works via Webex Teams API to interact with Webex Teams. It currently has the following features
+1. Send messages
+2. Broadcast to multiple rooms
+3. Send Files
+4. Manage a Webex team room 
+5. Add / Remove users from Webex Teams room in bulk
+6. A message relay server than can be hosted as a microservice allowing other services to send messages to Webex Teams.
+7. Create an Onboarding Server that can onboard users via the website. 
+8. Start up a Interactive Terminal UI or a Terminal console to send / recieve files or messages from Webex Teams
+9. *Experimental* Start this up as a control center on a remote server and control the remote server via Webex Teams.
 
-1. Send messages to webex teams on remote system events
-2. Send message to webex periodically via cronjob
-3. Use a custom bot to update room on a Jenkins event.
-4. Update build stages to webex teams
-5. Update intermediate binary builds paths to webex teams etc..
-6. Interact with Webex via a Terminal based UI
+## The Why?
+This tool was born out of a necessity to send notifications to Webex Teams from CI/CD pipelines. Over time it has grown in capability and function therefore putting this out to the public to use / expand.
 
 ## Usage:
 Set Env variable **WEBEX_ACCESS_TOKEN**, which can get retrieved from [https://developer.webex.com/docs/api/getting-started](https://developer.webex.com/docs/api/getting-started)

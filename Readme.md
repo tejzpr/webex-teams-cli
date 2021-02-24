@@ -1,4 +1,4 @@
-# Webex-Teams-CLI - A CLI tool to send messages to / interact with Cisco Webex Teams.
+# Webex-Teams-CLI - A CLI tool to interact with Cisco Webex Teams.
 
 ## The What?
 Webex Teams CLI is a versatile tool that works via Webex Teams API to interact with Webex Teams. It currently has the following features

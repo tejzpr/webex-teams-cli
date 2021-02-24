@@ -11,6 +11,7 @@ Webex Teams CLI is a versatile tool that works via Webex Teams API to interact w
 7. Create an Onboarding Server that can onboard users via the website. 
 8. Start up a Interactive Terminal UI or a Terminal console to send / recieve files or messages from Webex Teams
 9. *Experimental* Start this up as a control center on a remote server and control the remote server via Webex Teams.
+10. Capability to run on many architectures including Linux x86_64, Linux Arm64, Darwin (MacOs x86_64, Arm64), Windows etc. without any external dependencies. I've tested it on Alpine Linux, Raspberry PI, MacOs, Windows.  (Thanks to Golang)
 
 ## The Why?
 This tool was born out of a necessity to send notifications to Webex Teams from CI/CD pipelines. Over time it has grown in capability and function therefore putting this out to the public to use / expand.

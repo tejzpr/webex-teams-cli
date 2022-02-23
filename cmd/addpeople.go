@@ -41,7 +41,7 @@ func (app *Application) AddPeopleCMD() *cli.Command {
 			&cli.StringFlag{
 				Name:     "confirm",
 				Aliases:  []string{"c"},
-				Value:    "",
+				Value:    "n",
 				Usage:    "Continue without confirmation? Allowed values are 'y' or 'n' ",
 				Required: false,
 			},
@@ -113,7 +113,6 @@ func (app *Application) AddPeopleCMD() *cli.Command {
 					if !strings.HasSuffix("y", strings.TrimSpace(strings.ToLower(confirm))) {
 						return nil
 					}
-				} else {
 					reader := bufio.NewReader(os.Stdin)
 					fmt.Print("Continue to add members to all rooms that you have moderator access to? (y/n) : ")
 					text, _ := reader.ReadString('\n')

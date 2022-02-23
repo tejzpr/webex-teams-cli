@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"crypto/md5"
-	b64 "encoding/base64"
 	"encoding/csv"
 	"encoding/hex"
 	"fmt"
@@ -58,22 +57,25 @@ func (app *Application) getAdlerHash(str string) string {
 }
 
 func (app *Application) parseRoomID(str string) (string, error) {
-	err := app.validateUUID(str)
-	if err == nil {
-		return str, nil
-	}
+	return str, nil
+	/*
+		// Commenting out this code because parsing of roomid to uuid will no longer be supported
+		err := app.validateUUID(str)
+		if err == nil {
+			return str, nil
+		}
 
-	sDec, err := b64.StdEncoding.DecodeString(str)
-	if err != nil {
-		return "", err
-	}
-	urn := string(sDec)
-	parts := strings.Split(urn, "/ROOM/")
-	err = app.validateUUID(parts[1])
-	if err != nil {
-		return "", err
-	}
-	return parts[1], nil
+		sDec, err := b64.StdEncoding.DecodeString(str)
+		if err != nil {
+			return "", err
+		}
+		urn := string(sDec)
+		parts := strings.Split(urn, "/ROOM/")
+		err = app.validateUUID(parts[1])
+		if err != nil {
+			return "", err
+		}
+		return parts[1], nil*/
 }
 
 // userCSV struct

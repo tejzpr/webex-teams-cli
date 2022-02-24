@@ -14,3 +14,7 @@ env GOOS=darwin GOARCH=amd64 go build -buildmode=pie -trimpath
 mv webex-teams-cli ./dist/webex-teams-cli_darwin_x86_64
 env GOOS=darwin GOARCH=arm64 go build -buildmode=pie -trimpath
 mv webex-teams-cli ./dist/webex-teams-cli_darwin_arm64
+
+cd dist
+
+for i in webex-teams-cli*; do tar -czf $i.tar.gz $i; done

@@ -5,13 +5,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	"github.com/google/go-querystring/query"
 	"github.com/peterhellberg/link"
 )
 
 // PeopleService is the service to communicate with the People API endpoint
 type PeopleService service
+
+// PersonPhoneNumber is the list of phone numbers of a person
+type PersonPhoneNumber struct {
+	NumberType string `json:"type,omitempty"`  // Phone number type
+	Value      string `json:"value,omitempty"` // Phone number value
+}
+
+// PersonSIPAddress is the list of phone numbers of a person
+type PersonSIPAddress struct {
+	AddressType string `json:"type,omitempty"`    // SIP Address type
+	Value       string `json:"value,omitempty"`   // SIP Address value
+	Primary     bool   `json:"primary,omitempty"` // SIP Address flag
+}
 
 // People is the List of Persons
 type People struct {
@@ -32,21 +45,26 @@ type PersonRequest struct {
 
 // Person is the Person definition
 type Person struct {
-	ID           string    `json:"id,omitempty"`           // Person ID.
-	Emails       []string  `json:"emails,omitempty"`       // Person email array.
-	DisplayName  string    `json:"displayName,omitempty"`  // Person display name.
-	NickName     string    `json:"nickName,omitempty"`     // Person nickname.
-	FirstName    string    `json:"firstName,omitempty"`    // Person first name.
-	LastName     string    `json:"lastName,omitempty"`     // Person last name.
-	Avatar       string    `json:"avatar,omitempty"`       // Person avatar URL.
-	OrgID        string    `json:"orgId,omitempty"`        // Person organization ID.
-	Roles        []string  `json:"roles,omitempty"`        // Person roles.
-	Licenses     []string  `json:"licenses,omitempty"`     // Person licenses.
-	Created      time.Time `json:"created,omitempty"`      // Person creation date/time.
-	TimeZone     string    `json:"timeZone,omitempty"`     // Person time zone.
-	LastActivity time.Time `json:"lastActivity,omitempty"` // Person last active date/time.
-	Status       string    `json:"status,omitempty"`       // Person presence status (active or inactive).
-	PersonType   string    `json:"type,omitempty"`         // Person type (person or bot).
+	ID            string              `json:"id,omitempty"`            // Person ID.
+	Emails        []string            `json:"emails,omitempty"`        // Person email array.
+	SIPAddresses  []PersonSIPAddress  `json:"sipAddresses,omitempty"`  // Person SIP Addresses
+	PhoneNumbers  []PersonPhoneNumber `json:"phoneNumbers,omitempty"`  //Person phone numbers
+	DisplayName   string              `json:"displayName,omitempty"`   // Person display name.
+	NickName      string              `json:"nickName,omitempty"`      // Person nickname.
+	FirstName     string              `json:"firstName,omitempty"`     // Person first name.
+	LastName      string              `json:"lastName,omitempty"`      // Person last name.
+	Avatar        string              `json:"avatar,omitempty"`        // Person avatar URL.
+	OrgID         string              `json:"orgId,omitempty"`         // Person organization ID.
+	Roles         []string            `json:"roles,omitempty"`         // Person roles.
+	Licenses      []string            `json:"licenses,omitempty"`      // Person licenses.
+	Created       time.Time           `json:"created,omitempty"`       // Person creation date/time.
+	LastModified  time.Time           `json:"lastModified,omitempty"`  // Person last modified
+	TimeZone      string              `json:"timeZone,omitempty"`      // Person time zone.
+	LastActivity  time.Time           `json:"lastActivity,omitempty"`  // Person last active date/time.
+	Status        string              `json:"status,omitempty"`        // Person presence status
+	InvitePending bool                `json:"invitePending,omitempty"` // Person invite pending
+	LoginEnabled  bool                `json:"loginEnabled,omitempty"`  // Person login Enabled
+	PersonType    string              `json:"type,omitempty"`          // Person type (person or bot).
 }
 
 // AddPerson is used to append a person to a slice of People
@@ -55,13 +73,14 @@ func (people *People) AddPerson(item Person) []Person {
 	return people.Items
 }
 
-func peoplePagination(linkHeader string, size, max int) *People {
+func (s *PeopleService) peoplePagination(linkHeader string, size, max int) *People {
 	items := &People{}
 
 	for _, l := range link.Parse(linkHeader) {
 		if l.Rel == "next" {
-			response, err := RestyClient.R().
+			response, err := s.client.R().
 				SetResult(&People{}).
+				SetError(&Error{}).
 				Get(l.URI)
 
 			if err != nil {
@@ -71,13 +90,13 @@ func peoplePagination(linkHeader string, size, max int) *People {
 			if size != 0 {
 				size = size + len(items.Items)
 				if size < max {
-					people := peoplePagination(response.Header().Get("Link"), size, max)
+					people := s.peoplePagination(response.Header().Get("Link"), size, max)
 					for _, person := range people.Items {
 						items.AddPerson(person)
 					}
 				}
 			} else {
-				people := peoplePagination(response.Header().Get("Link"), size, max)
+				people := s.peoplePagination(response.Header().Get("Link"), size, max)
 				for _, person := range people.Items {
 					items.AddPerson(person)
 				}
@@ -100,9 +119,10 @@ func (s *PeopleService) CreatePerson(personRequest *PersonRequest) (*Person, *re
 
 	path := "/people/"
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetBody(personRequest).
 		SetResult(&Person{}).
+		SetError(&Error{}).
 		Post(path)
 
 	if err != nil {
@@ -126,7 +146,8 @@ func (s *PeopleService) DeletePerson(personID string) (*resty.Response, error) {
 	path := "/people/{personId}"
 	path = strings.Replace(path, "{"+"personId"+"}", fmt.Sprintf("%v", personID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
+		SetError(&Error{}).
 		Delete(path)
 
 	if err != nil {
@@ -145,8 +166,9 @@ func (s *PeopleService) GetMe() (*Person, *resty.Response, error) {
 
 	path := "/people/me"
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetResult(&Person{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -170,8 +192,9 @@ func (s *PeopleService) GetPerson(personID string) (*Person, *resty.Response, er
 	path := "/people/{personId}"
 	path = strings.Replace(path, "{"+"personId"+"}", fmt.Sprintf("%v", personID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetResult(&Person{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -211,9 +234,10 @@ func (s *PeopleService) ListPeople(queryParams *ListPeopleQueryParams) (*People,
 
 	queryParamsString, _ := query.Values(queryParams)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetQueryString(queryParamsString.Encode()).
 		SetResult(&People{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -221,14 +245,14 @@ func (s *PeopleService) ListPeople(queryParams *ListPeopleQueryParams) (*People,
 	}
 
 	result := response.Result().(*People)
-	if queryParams.Paginate == true {
-		items := peoplePagination(response.Header().Get("Link"), 0, 0)
+	if queryParams.Paginate {
+		items := s.peoplePagination(response.Header().Get("Link"), 0, 0)
 		for _, person := range items.Items {
 			result.AddPerson(person)
 		}
 	} else {
 		if len(result.Items) < queryParams.Max {
-			items := peoplePagination(response.Header().Get("Link"), len(result.Items), queryParams.Max)
+			items := s.peoplePagination(response.Header().Get("Link"), len(result.Items), queryParams.Max)
 			for _, person := range items.Items {
 				result.AddPerson(person)
 			}
@@ -252,9 +276,10 @@ func (s *PeopleService) Update(personID string, personRequest *PersonRequest) (*
 	path := "/people/{personId}"
 	path = strings.Replace(path, "{"+"personId"+"}", fmt.Sprintf("%v", personID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetBody(personRequest).
 		SetResult(&Person{}).
+		SetError(&Error{}).
 		Put(path)
 
 	if err != nil {

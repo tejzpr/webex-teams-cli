@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 )
 
 // ContentsService is the service to communicate with the Contents API endpoint
@@ -20,7 +20,8 @@ func (s *ContentsService) GetContent(contentID string) (*resty.Response, error) 
 	path := "/contents/{contentId}"
 	path = strings.Replace(path, "{"+"contentId"+"}", fmt.Sprintf("%v", contentID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {

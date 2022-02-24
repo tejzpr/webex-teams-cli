@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	"github.com/google/go-querystring/query"
 	"github.com/peterhellberg/link"
 )
@@ -42,14 +42,15 @@ func (teams *Teams) AddTeam(item Team) []Team {
 	return teams.Items
 }
 
-func teamsPagination(linkHeader string, size, max int) *Teams {
+func (s *TeamsService) teamsPagination(linkHeader string, size, max int) *Teams {
 	items := &Teams{}
 
 	for _, l := range link.Parse(linkHeader) {
 		if l.Rel == "next" {
 
-			response, err := RestyClient.R().
+			response, err := s.client.R().
 				SetResult(&Teams{}).
+				SetError(&Error{}).
 				Get(l.URI)
 
 			if err != nil {
@@ -59,13 +60,13 @@ func teamsPagination(linkHeader string, size, max int) *Teams {
 			if size != 0 {
 				size = size + len(items.Items)
 				if size < max {
-					teams := teamsPagination(response.Header().Get("Link"), size, max)
+					teams := s.teamsPagination(response.Header().Get("Link"), size, max)
 					for _, team := range teams.Items {
 						items.AddTeam(team)
 					}
 				}
 			} else {
-				teams := teamsPagination(response.Header().Get("Link"), size, max)
+				teams := s.teamsPagination(response.Header().Get("Link"), size, max)
 				for _, team := range teams.Items {
 					items.AddTeam(team)
 				}
@@ -88,9 +89,10 @@ func (s *TeamsService) CreateTeam(teamCreateRequest *TeamCreateRequest) (*Team, 
 
 	path := "/teams/"
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetBody(teamCreateRequest).
 		SetResult(&Team{}).
+		SetError(&Error{}).
 		Post(path)
 
 	if err != nil {
@@ -114,7 +116,8 @@ func (s *TeamsService) DeleteTeam(teamID string) (*resty.Response, error) {
 	path := "/teams/{teamId}"
 	path = strings.Replace(path, "{"+"teamId"+"}", fmt.Sprintf("%v", teamID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
+		SetError(&Error{}).
 		Delete(path)
 
 	if err != nil {
@@ -137,8 +140,9 @@ func (s *TeamsService) GetTeam(teamID string) (*Team, *resty.Response, error) {
 	path := "/teams/{teamId}"
 	path = strings.Replace(path, "{"+"teamId"+"}", fmt.Sprintf("%v", teamID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetResult(&Team{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -168,9 +172,10 @@ func (s *TeamsService) ListTeams(queryParams *ListTeamsQueryParams) (*Teams, *re
 
 	queryParamsString, _ := query.Values(queryParams)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetQueryString(queryParamsString.Encode()).
 		SetResult(&Teams{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -178,14 +183,14 @@ func (s *TeamsService) ListTeams(queryParams *ListTeamsQueryParams) (*Teams, *re
 	}
 
 	result := response.Result().(*Teams)
-	if queryParams.Paginate == true {
-		items := teamsPagination(response.Header().Get("Link"), 0, 0)
+	if queryParams.Paginate {
+		items := s.teamsPagination(response.Header().Get("Link"), 0, 0)
 		for _, team := range items.Items {
 			result.AddTeam(team)
 		}
 	} else {
 		if len(result.Items) < queryParams.Max {
-			items := teamsPagination(response.Header().Get("Link"), len(result.Items), queryParams.Max)
+			items := s.teamsPagination(response.Header().Get("Link"), len(result.Items), queryParams.Max)
 			for _, team := range items.Items {
 				result.AddTeam(team)
 			}
@@ -208,9 +213,10 @@ func (s *TeamsService) UpdateTeam(teamID string, teamUpdateRequest *TeamUpdateRe
 	path := "/teams/{teamId}"
 	path = strings.Replace(path, "{"+"teamId"+"}", fmt.Sprintf("%v", teamID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetBody(teamUpdateRequest).
 		SetResult(&Team{}).
+		SetError(&Error{}).
 		Put(path)
 
 	if err != nil {

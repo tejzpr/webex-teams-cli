@@ -75,7 +75,8 @@ func (app *Application) parseRoomID(str string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return parts[1], nil*/
+		return parts[1], nil
+	*/
 }
 
 // userCSV struct

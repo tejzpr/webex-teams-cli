@@ -6,7 +6,7 @@ import (
 
 	"time"
 
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	"github.com/google/go-querystring/query"
 	"github.com/peterhellberg/link"
 )
@@ -50,14 +50,15 @@ func (memberships *Memberships) AddMembership(item Membership) []Membership {
 	return memberships.Items
 }
 
-func membershipsPagination(linkHeader string, size, max int) *Memberships {
+func (s *MembershipsService) membershipsPagination(linkHeader string, size, max int) *Memberships {
 	items := &Memberships{}
 
 	for _, l := range link.Parse(linkHeader) {
 		if l.Rel == "next" {
 
-			response, err := RestyClient.R().
+			response, err := s.client.R().
 				SetResult(&Memberships{}).
+				SetError(&Error{}).
 				Get(l.URI)
 
 			if err != nil {
@@ -67,13 +68,13 @@ func membershipsPagination(linkHeader string, size, max int) *Memberships {
 			if size != 0 {
 				size = size + len(items.Items)
 				if size < max {
-					memberships := membershipsPagination(response.Header().Get("Link"), size, max)
+					memberships := s.membershipsPagination(response.Header().Get("Link"), size, max)
 					for _, membership := range memberships.Items {
 						items.AddMembership(membership)
 					}
 				}
 			} else {
-				memberships := membershipsPagination(response.Header().Get("Link"), size, max)
+				memberships := s.membershipsPagination(response.Header().Get("Link"), size, max)
 				for _, membership := range memberships.Items {
 					items.AddMembership(membership)
 				}
@@ -94,9 +95,10 @@ func (s *MembershipsService) CreateMembership(membershipCreateRequest *Membershi
 
 	path := "/memberships/"
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetBody(membershipCreateRequest).
 		SetResult(&Membership{}).
+		SetError(&Error{}).
 		Post(path)
 
 	if err != nil {
@@ -120,7 +122,8 @@ func (s *MembershipsService) DeleteMembership(membershipID string) (*resty.Respo
 	path := "/memberships/{membershipId}"
 	path = strings.Replace(path, "{"+"membershipId"+"}", fmt.Sprintf("%v", membershipID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
+		SetError(&Error{}).
 		Delete(path)
 
 	if err != nil {
@@ -143,8 +146,9 @@ func (s *MembershipsService) GetMembership(membershipID string) (*Membership, *r
 	path := "/memberships/{membershipId}"
 	path = strings.Replace(path, "{"+"membershipId"+"}", fmt.Sprintf("%v", membershipID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetResult(&Membership{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -185,9 +189,10 @@ func (s *MembershipsService) ListMemberships(queryParams *ListMembershipsQueryPa
 
 	queryParamsString, _ := query.Values(queryParams)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetQueryString(queryParamsString.Encode()).
 		SetResult(&Memberships{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -195,14 +200,14 @@ func (s *MembershipsService) ListMemberships(queryParams *ListMembershipsQueryPa
 	}
 
 	result := response.Result().(*Memberships)
-	if queryParams.Paginate == true {
-		items := membershipsPagination(response.Header().Get("Link"), 0, 0)
+	if queryParams.Paginate {
+		items := s.membershipsPagination(response.Header().Get("Link"), 0, 0)
 		for _, membership := range items.Items {
 			result.AddMembership(membership)
 		}
 	} else {
 		if len(result.Items) < queryParams.Max {
-			items := membershipsPagination(response.Header().Get("Link"), len(result.Items), queryParams.Max)
+			items := s.membershipsPagination(response.Header().Get("Link"), len(result.Items), queryParams.Max)
 			for _, membership := range items.Items {
 				result.AddMembership(membership)
 			}
@@ -226,9 +231,10 @@ func (s *MembershipsService) UpdateMembership(membershipID string, membershipUpd
 	path := "/memberships/{membershipId}"
 	path = strings.Replace(path, "{"+"membershipId"+"}", fmt.Sprintf("%v", membershipID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetBody(membershipUpdateRequest).
 		SetResult(&Membership{}).
+		SetError(&Error{}).
 		Put(path)
 
 	if err != nil {

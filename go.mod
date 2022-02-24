@@ -3,22 +3,22 @@ module webex-teams-cli
 go 1.14
 
 require (
-	github.com/gabriel-vasile/mimetype v1.0.5
-	github.com/gammazero/workerpool v0.0.0-20200311205957-7b00833861c6
-	github.com/go-chi/chi v4.1.1+incompatible
-	github.com/go-ozzo/ozzo-validation/v4 v4.1.0
-	github.com/go-resty/resty v0.0.0-00010101000000-000000000000 // indirect
-	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/google/uuid v1.1.1
-	github.com/h2non/filetype v1.0.12 // indirect
-	github.com/jbogarin/go-cisco-webex-teams v0.3.0
-	github.com/jroimartin/gocui v0.4.0
-	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
-	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
-	github.com/peterhellberg/link v1.1.0 // indirect
-	github.com/sirupsen/logrus v1.5.0
-	github.com/urfave/cli/v2 v2.2.0
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.0
+	github.com/gammazero/deque v0.1.1 // indirect
+	github.com/gammazero/workerpool v1.1.2
+	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/google/uuid v1.3.0
+	github.com/jbogarin/go-cisco-webex-teams v0.4.2
+	github.com/jroimartin/gocui v0.5.0
+	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/orcaman/concurrent-map v1.0.0
+	github.com/sirupsen/logrus v1.8.1
+	github.com/urfave/cli/v2 v2.3.0
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/sys v0.0.0-20220223155357-96fed51e1446 // indirect
 )
 
-replace github.com/go-resty/resty => gopkg.in/resty.v1 v1.12.0
+replace github.com/jbogarin/go-cisco-webex-teams => github.com/tejzpr/go-cisco-webex-teams v0.4.3-0.20220223214525-b2cbb0c40527

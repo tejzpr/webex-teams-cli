@@ -186,6 +186,13 @@ func (m ConcurrentMap) IterBuffered() <-chan Tuple {
 	return ch
 }
 
+// Clear removes all items from map.
+func (m ConcurrentMap) Clear() {
+	for item := range m.IterBuffered() {
+		m.Remove(item.Key)
+	}
+}
+
 // Returns a array of channels that contains elements in each shard,
 // which likely takes a snapshot of `m`.
 // It returns once the size of each buffered channel is determined,
@@ -305,7 +312,8 @@ func (m ConcurrentMap) MarshalJSON() ([]byte, error) {
 func fnv32(key string) uint32 {
 	hash := uint32(2166136261)
 	const prime32 = uint32(16777619)
-	for i := 0; i < len(key); i++ {
+	keyLength := len(key)
+	for i := 0; i < keyLength; i++ {
 		hash *= prime32
 		hash ^= uint32(key[i])
 	}

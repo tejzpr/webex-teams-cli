@@ -1,13 +1,12 @@
 # deque
 
-[![Build Status](https://travis-ci.com/gammazero/deque.svg)](https://travis-ci.com/gammazero/deque)
+[![GoDoc](https://pkg.go.dev/badge/github.com/gammazero/deque)](https://pkg.go.dev/github.com/gammazero/deque)
+[![Build Status](https://github.com/gammazero/deque/actions/workflows/go.yml/badge.svg)](https://github.com/gammazero/deque/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gammazero/deque)](https://goreportcard.com/report/github.com/gammazero/deque)
 [![codecov](https://codecov.io/gh/gammazero/deque/branch/master/graph/badge.svg)](https://codecov.io/gh/gammazero/deque)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Extremely fast ring-buffer deque ([double-ended queue](https://en.wikipedia.org/wiki/Double-ended_queue)) implementation.
-
-[![GoDoc](https://godoc.org/github.com/gammazero/deque?status.svg)](https://godoc.org/github.com/gammazero/deque)
+Fast ring-buffer deque ([double-ended queue](https://en.wikipedia.org/wiki/Double-ended_queue)) implementation.
 
 For a pictorial description, see the [Deque diagram](https://github.com/gammazero/deque/wiki)
 
@@ -25,13 +24,13 @@ Deque generalizes a queue and a stack, to efficiently add and remove items at ei
 
 This deque implementation is optimized for CPU and GC performance.  The circular buffer automatically re-sizes by powers of two, growing when additional capacity is needed and shrinking when only a quarter of the capacity is used, and uses bitwise arithmetic for all calculations.  Since growth is by powers of two, adding elements will only cause O(log n) allocations.
 
-The ring-buffer implementation significantly improves memory and time performance with fewer GC pauses, compared to implementations based on slices and linked lists.  By wrapping around the buffer, previously used space is reused, making allocation unnecessary until all buffer capacity is used.
+The ring-buffer implementation improves memory and time performance with fewer GC pauses, compared to implementations based on slices and linked lists.  By wrapping around the buffer, previously used space is reused, making allocation unnecessary until all buffer capacity is used.  This is particularly efficient when data going into the dequeue is relatively balanced against data coming out.  However, if size changes are very large and only fill and then empty then deque, the ring structure offers little benefit for memory reuse.  For that usage pattern a different implementation may be preferable.
 
 For maximum speed, this deque implementation leaves concurrency safety up to the application to provide, however the application chooses, if needed at all.
 
 ## Reading Empty Deque
 
-Since it is OK for the deque to contain a nil value, it is necessary to either panic or return a second boolean value to indicate the deque is empty, when reading or removing an element.  This deque panics when reading from an empty deque.  This is a run-time check to help catch programming errors, which may be missed if a second return value is ignored.  Simply check Deque.Len() before reading from the deque.
+Since it is OK for the deque to contain a `nil` value, it is necessary to either panic or return a second boolean value to indicate the deque is empty, when reading or removing an element.  This deque panics when reading from an empty deque.  This is a run-time check to help catch programming errors, which may be missed if a second return value is ignored.  Simply check `Deque.Len()` before reading from the deque.
 
 ## Example
 

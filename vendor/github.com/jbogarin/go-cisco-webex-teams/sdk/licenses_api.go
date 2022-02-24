@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	"github.com/google/go-querystring/query"
 	"github.com/peterhellberg/link"
 )
@@ -31,14 +31,15 @@ func (licenses *Licenses) AddLicense(item License) []License {
 	return licenses.Items
 }
 
-func licensesPagination(linkHeader string, size, max int) *Licenses {
+func (s *LicensesService) licensesPagination(linkHeader string, size, max int) *Licenses {
 	items := &Licenses{}
 
 	for _, l := range link.Parse(linkHeader) {
 		if l.Rel == "next" {
 
-			response, err := RestyClient.R().
+			response, err := s.client.R().
 				SetResult(&Licenses{}).
+				SetError(&Error{}).
 				Get(l.URI)
 
 			if err != nil {
@@ -48,13 +49,13 @@ func licensesPagination(linkHeader string, size, max int) *Licenses {
 			if size != 0 {
 				size = size + len(items.Items)
 				if size < max {
-					licenses := licensesPagination(response.Header().Get("Link"), size, max)
+					licenses := s.licensesPagination(response.Header().Get("Link"), size, max)
 					for _, license := range licenses.Items {
 						items.AddLicense(license)
 					}
 				}
 			} else {
-				licenses := licensesPagination(response.Header().Get("Link"), size, max)
+				licenses := s.licensesPagination(response.Header().Get("Link"), size, max)
 				for _, license := range licenses.Items {
 					items.AddLicense(license)
 				}
@@ -78,8 +79,9 @@ func (s *LicensesService) GetLicense(licenseID string) (*License, *resty.Respons
 	path := "/licenses/{licenseId}"
 	path = strings.Replace(path, "{"+"licenseId"+"}", fmt.Sprintf("%v", licenseID), -1)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetResult(&License{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -111,9 +113,10 @@ func (s *LicensesService) ListLicenses(queryParams *ListLicensesQueryParams) (*L
 
 	queryParamsString, _ := query.Values(queryParams)
 
-	response, err := RestyClient.R().
+	response, err := s.client.R().
 		SetQueryString(queryParamsString.Encode()).
 		SetResult(&Licenses{}).
+		SetError(&Error{}).
 		Get(path)
 
 	if err != nil {
@@ -121,14 +124,14 @@ func (s *LicensesService) ListLicenses(queryParams *ListLicensesQueryParams) (*L
 	}
 
 	result := response.Result().(*Licenses)
-	if queryParams.Paginate == true {
-		items := licensesPagination(response.Header().Get("Link"), 0, 0)
+	if queryParams.Paginate {
+		items := s.licensesPagination(response.Header().Get("Link"), 0, 0)
 		for _, license := range items.Items {
 			result.AddLicense(license)
 		}
 	} else {
 		if len(result.Items) < queryParams.Max {
-			items := licensesPagination(response.Header().Get("Link"), len(result.Items), queryParams.Max)
+			items := s.licensesPagination(response.Header().Get("Link"), len(result.Items), queryParams.Max)
 			for _, license := range items.Items {
 				result.AddLicense(license)
 			}

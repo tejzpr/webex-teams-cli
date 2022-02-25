@@ -40,7 +40,7 @@ webex-teams-cli room msg -t "message text" -f <file>
 ### Using Docker:
 Send a text message using the docker image
 ```docker
-docker run -it ghcr.io/tejzpr/webex-teams-cli:main webex-teams-cli --accessToken <access-token> room --pe user@email.com msg it "a test message"
+docker run -it ghcr.io/tejzpr/webex-teams-cli:main webex-teams-cli --accessToken <access-token> room --pe user@email.com msg -t "a test message"
 ```
 Send a file _test.txt_ using docker
 ```docker

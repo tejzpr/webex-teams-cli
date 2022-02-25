@@ -12,5 +12,5 @@ WORKDIR /app
 
 COPY --from=build /app/webex-teams-cli /app/webex-teams-cli
 COPY --from=build /app/run.sh /app/run.sh
-
+ENV PATH="/app:${PATH}"
 CMD ["/app/webex-teams-cli", "-v"] 

@@ -46,6 +46,15 @@ Send a file _test.txt_ using docker
 ```docker
 docker run -it -v /testdir:/testdir  ghcr.io/tejzpr/webex-teams-cli:main webex-teams-cli --accessToken <access-token> room --pe user@email.com msg -f /testdir/test.txt
 ```
+Find the room details for a title
+```docker
+docker run -it -v /testdir:/testdir  ghcr.io/tejzpr/webex-teams-cli:main webex-teams-cli utils findroom -t "Room Name"
+```
+## Find the room details for a title
+-----------------------------------------
+```sh
+webex-teams-cli --accessToken <access-token> utils findroom -t "Room Name"
+```
 ## Send a message based on room ID
 -----------------------------------------
 Set Env variable **WEBEX_ROOM_ID**, is the Space ID that you can get by visiting https://teams.webex.com/ and clicking on a room.

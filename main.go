@@ -67,6 +67,7 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			appWebex.RoomCMD(),
+			appWebex.WebexUtils(),
 			appWebex.AddUserToRoomServer(),
 			appWebex.MessageRelayServer(),
 			appWebex.ShellCMD(),

@@ -48,7 +48,7 @@ docker run -it -v /testdir:/testdir  ghcr.io/tejzpr/webex-teams-cli:main webex-t
 ```
 Find the room details for a title
 ```docker
-docker run -it -v /testdir:/testdir  ghcr.io/tejzpr/webex-teams-cli:main webex-teams-cli utils findroom -t "Room Name"
+docker run -it ghcr.io/tejzpr/webex-teams-cli:main webex-teams-cli utils findroom -t "Room Name"
 ```
 ## Find the room details for a title
 -----------------------------------------

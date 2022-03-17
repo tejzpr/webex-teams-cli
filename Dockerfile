@@ -3,7 +3,7 @@ WORKDIR /app
 ADD . /app
 RUN apk add gcc musl-dev upx git
 RUN echo "Starting Build" && \
-    CC=$(which musl-gcc) GOOS=linux GOARCH=amd64 go build -a -tags -buildmode=pie -trimpath --ldflags '-s -w -linkmode external -extldflags "-static"' && \
+    CC=$(which musl-gcc) CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -buildmode=pie -trimpath --ldflags '-s -w -linkmode external -extldflags "-static"' && \
     upx --best --lzma ./webex-teams-cli && \
     ./webex-teams-cli -v && \
     mkdir -p /dist/app && mkdir -p /dist/etc/ssl/certs/ && \
@@ -14,6 +14,5 @@ RUN echo "Starting Build" && \
 
 FROM scratch
 COPY --from=build /dist/ /
-WORKDIR /app
 ENV PATH="/app:${PATH}"
 CMD ["/app/webex-teams-cli", "-v"]

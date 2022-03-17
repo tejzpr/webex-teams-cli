@@ -1,4 +1,3 @@
-build_dist.sh
 dist
 .idea
 .DS_Store*

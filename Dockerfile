@@ -6,12 +6,11 @@ RUN echo "Starting Build" && \
     CC=$(which musl-gcc) GOOS=linux GOARCH=amd64 go build -a -tags -buildmode=pie -trimpath --ldflags '-s -w -linkmode external -extldflags "-static"' && \
     upx --best --lzma ./webex-teams-cli && \
     ./webex-teams-cli -v && \
-    echo "Completed Build" 
-
-RUN mkdir -p /dist/app && mkdir -p /dist/etc/ssl/certs/ && \
+    mkdir -p /dist/app && mkdir -p /dist/etc/ssl/certs/ && \
     mv /etc/ssl/certs/ca-certificates.crt /dist/etc/ssl/certs/ && \
     mv /app/webex-teams-cli /dist/app/webex-teams-cli && \
-    mv /app/run.sh /dist/app/run.sh
+    mv /app/run.sh /dist/app/run.sh && \
+    echo "Completed Build" 
 
 FROM scratch
 COPY --from=build /dist/ /

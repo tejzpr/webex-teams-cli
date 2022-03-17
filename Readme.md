@@ -2,6 +2,7 @@
 [![Golang](https://img.shields.io/badge/-Go%20Lang-blue?logo=go&logoColor=white)](https://golang.org)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tejzpr/webex-teams-cli)](https://goreportcard.com/report/github.com/tejzpr/webex-teams-cli)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/tejzpr/webex-teams-cli)
+[![CodeQL](https://github.com/tejzpr/webex-teams-cli/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/tejzpr/webex-teams-cli/actions/workflows/codeql-analysis.yml)
 
 # Webex-Teams-CLI - A CLI tool to interact with Cisco Webex Teams.
 

@@ -17,4 +17,4 @@ FROM scratch
 COPY --from=build /dist/ /
 WORKDIR /app
 ENV PATH="/app:${PATH}"
-CMD ["/app/webex-teams-cli", "-v"] 
+CMD ["/app/webex-teams-cli", "-v"]

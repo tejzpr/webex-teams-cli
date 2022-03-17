@@ -3,7 +3,7 @@ WORKDIR /app
 ADD . /app
 RUN apk add build-base
 RUN echo "Starting Build" && \
-    CC=$(which musl-gcc) go build -buildmode=pie -trimpath --ldflags '-w -linkmode external -extldflags "-static"' && \
+    CC=$(which musl-gcc) go build -buildmode=pie -trimpath --ldflags '-s -w -linkmode external -extldflags "-static"' && \
     echo "Completed Build" 
 
 FROM scratch

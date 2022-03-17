@@ -8,11 +8,13 @@ RUN echo "Starting Build" && \
     ./webex-teams-cli -v && \
     echo "Completed Build" 
 
-FROM scratch
+RUN mkdir -p /dist/app && mkdir -p /dist/etc/ssl/certs/ && \
+    mv /etc/ssl/certs/ca-certificates.crt /dist/etc/ssl/certs/ && \
+    mv /app/webex-teams-cli /dist/app/webex-teams-cli && \
+    mv /app/run.sh /dist/app/run.sh
 
+FROM scratch
+COPY --from=build /dist/ /
 WORKDIR /app
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /app/webex-teams-cli /app/webex-teams-cli
-COPY --from=build /app/run.sh /app/run.sh
 ENV PATH="/app:${PATH}"
 CMD ["/app/webex-teams-cli", "-v"] 

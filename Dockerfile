@@ -1,9 +1,11 @@
-FROM golang:1.16-alpine AS build
+FROM golang:1.18-alpine AS build
 WORKDIR /app
 ADD . /app
-RUN apk add build-base
+RUN apk add gcc musl-dev upx git
 RUN echo "Starting Build" && \
-    CC=$(which musl-gcc) go build -buildmode=pie -trimpath --ldflags '-s -w -linkmode external -extldflags "-static"' && \
+    CC=$(which musl-gcc) GOOS=linux GOARCH=amd64 go build -a -tags -buildmode=pie -trimpath --ldflags '-s -w -linkmode external -extldflags "-static"' && \
+    upx --best --lzma ./webex-teams-cli && \
+    ./webex-teams-cli -v && \
     echo "Completed Build" 
 
 FROM scratch

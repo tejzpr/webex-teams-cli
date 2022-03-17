@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -73,6 +74,19 @@ type SendMessageParams struct {
 	Text                     string
 	Filename                 string
 	RemoteFileRequestTimeout time.Duration
+}
+
+// ErrorDetails contains the details of the error
+type ErrorDetails struct {
+	Description string `json:"description,omitempty"`
+}
+
+// Error indicates an error from the invocation of a Webex API. See
+// the following documentation for error context: https://developer.webex.com/docs/api/basics#api-errors.
+type Error struct {
+	Message    string         `json:"message,omitempty"`
+	Errors     []ErrorDetails `json:"errors,omitempty"`
+	TrackingID string         `json:"trackingId,omitempty"`
 }
 
 // SendMessage2Room send a message
@@ -217,9 +231,13 @@ func (app *Application) SendMessage2Room(params *SendMessageParams) (*webexteams
 		message.ToPersonEmail = params.PersonEmail
 	}
 
-	newTextMessage, _, err := app.Client.Messages.CreateMessage(message)
+	newTextMessage, res, err := app.Client.Messages.CreateMessage(message)
 	if err != nil {
 		return nil, err
+	} else if res.StatusCode() < 200 || res.StatusCode() > 299 {
+		var responseError Error
+		_ = json.Unmarshal(res.Body(), &responseError)
+		return nil, fmt.Errorf("%d: %s", res.StatusCode(), responseError.Message)
 	}
 
 	return newTextMessage, nil

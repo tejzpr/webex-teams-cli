@@ -19,6 +19,7 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220223155357-96fed51e1446 // indirect
+	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
 
 replace github.com/jbogarin/go-cisco-webex-teams => github.com/tejzpr/go-cisco-webex-teams v0.4.3-0.20220223214525-b2cbb0c40527

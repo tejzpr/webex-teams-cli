@@ -17,6 +17,7 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
+	log "github.com/sirupsen/logrus"
 )
 
 // Application struct
@@ -37,10 +38,16 @@ func (app *Application) createMember(room *webexteams.Room, email email, isModer
 		IsModerator: isModerator,
 	}
 
-	_, _, err := app.Client.Memberships.CreateMembership(membershipRequest)
+	_, res, err := app.Client.Memberships.CreateMembership(membershipRequest)
 	if err != nil {
 		return err
+	} else if res.StatusCode() < 200 || res.StatusCode() > 299 {
+		var responseError Error
+		_ = json.Unmarshal(res.Body(), &responseError)
+		return fmt.Errorf("Error adding %s [%d]: %s", email, res.StatusCode(), responseError.Message)
 	}
+
+	log.Infof("Added %s to %s", email, room.Title)
 	return nil
 }
 

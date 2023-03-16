@@ -52,6 +52,7 @@ func (app *Application) RoomCMD() *cli.Command {
 		Subcommands: []*cli.Command{
 			app.SendMessageToRoomCMD(),
 			app.AddPeopleCMD(),
+			app.ExportPeopleCMD(),
 			app.RemovePeopleCMD(),
 			app.BroadcastToRoomsCMD(),
 		},

@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -33,7 +34,7 @@ func (app *Application) AddPeopleCMD() *cli.Command {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "memberscsv",
-				Aliases:  []string{"mcsv"},
+				Aliases:  []string{"csv"},
 				Value:    "",
 				Usage:    "Path to CSV with list of email addresses formatted as : email, moderator",
 				Required: true,
@@ -290,23 +291,18 @@ func (app *AddPeopleApplication) processAddPeople(room *webexteams.Room) error {
 
 		defer csvfile.Close()
 		c := ParseUsersCSV(csvfile)
-		var wg sync.WaitGroup
-		wp := workerpool.New(10)
 		for v := range c {
 			if v.Err == nil {
-				wg.Add(1)
-				func(room *webexteams.Room, v UserCSVReturn) {
-					wp.Submit(func() {
-						defer wg.Done()
-						app.createMember(room, v.Value.Email, v.Value.IsModerator)
-					})
-				}(room, v)
+				// Sleep to avoid rate limiting
+				time.Sleep(2 * time.Second)
+				err := app.createMember(room, v.Value.Email, v.Value.IsModerator)
+				if err != nil {
+					log.Println(err)
+				}
 			} else {
 				return v.Err
 			}
 		}
-
-		wg.Wait()
 
 	} else {
 		return errors.New("You are not a member of this room")

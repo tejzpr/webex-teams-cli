@@ -98,6 +98,11 @@ webex-teams-cli room -toPersonEmail <person@email.com> msg -t "message text" -f 
 
 Distribution archive Includes executables for Linux amd_x64, Linux ARM5, Windows & Darwin (MacOS)
 
+## Export Members form a room
+Allows to export members of a room into a CSV file
+```sh
+webex-teams-cli room --roomID <roomID> exportmembers --csv ./members.csv 
+```
 ## Add Members to Room(s)
 Allows to add multiple members to room(s). The member list can be passed via a .csv file with the header & data
 email,moderator where email is a string and moderator acceps true/false

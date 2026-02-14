@@ -9,7 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/urfave/cli/v2"
 
-	"webex-teams-cli/cmd/tui"
+	"github.com/tejzpr/webex-teams-cli/cmd/tui"
 )
 
 // ChatCMD returns the top-level "chat" command that launches the Bubbletea TUI

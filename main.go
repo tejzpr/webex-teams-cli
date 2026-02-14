@@ -11,7 +11,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"webex-teams-cli/cmd"
+
+	"github.com/tejzpr/webex-teams-cli/cmd"
 
 	webex "github.com/tejzpr/webex-go-sdk/v2"
 	"github.com/tejzpr/webex-go-sdk/v2/contents"

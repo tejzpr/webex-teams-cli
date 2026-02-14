@@ -1,9 +1,9 @@
-FROM golang:1.25-alpine AS build
+FROM golang:1.26.0-alpine3.23 AS build
 WORKDIR /app
 ADD . /app
-RUN apk add gcc musl-dev git
+RUN apk add git
 RUN echo "Starting Build" && \
-    CC=$(which musl-gcc) CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -buildmode=pie -trimpath --ldflags '-s -w -linkmode external -extldflags "-static"' && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -trimpath -ldflags='-s -w' && \
     ./webex-teams-cli -v && \
     mkdir -p /dist/app && mkdir -p /dist/etc/ssl/certs/ && \
     mv /etc/ssl/certs/ca-certificates.crt /dist/etc/ssl/certs/ && \
@@ -14,4 +14,5 @@ RUN echo "Starting Build" && \
 FROM scratch
 COPY --from=build /dist/ /
 ENV PATH="/app:${PATH}"
-CMD ["/app/webex-teams-cli", "-v"]
+ENTRYPOINT ["/app/webex-teams-cli"]
+CMD ["-v"]

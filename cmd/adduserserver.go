@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
+	"github.com/tejzpr/webex-go-sdk/v2/memberships"
 	"github.com/urfave/cli/v2"
 )
 
@@ -69,7 +69,7 @@ func (app *AddUserToRoomServerApplication) addUser(w http.ResponseWriter, r *htt
 	webexroom, err := app.parseRoomID(tmproom)
 	if err != nil {
 		log.Debugf("The room %s does not valid", webexroom)
-		log.Debugf(err.Error())
+		log.Debug(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(fmt.Sprintf("Invalid Room")))
 		return
@@ -82,30 +82,30 @@ func (app *AddUserToRoomServerApplication) addUser(w http.ResponseWriter, r *htt
 		return
 	}
 	emailAddress := fmt.Sprintf("%s@%s", authSSOUser, app.EmailDomain)
-	room, _, err := app.Client.Rooms.GetRoom(webexroom)
+	room, err := app.Client.Rooms().Get(webexroom)
 	if err != nil {
 		log.Debugf("The room %s does not exists", webexroom)
-		log.Debugf(err.Error())
+		log.Debug(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(fmt.Sprintf("Invalid Room")))
 		return
 	}
 
-	membershipQueryParams := &webexteams.ListMembershipsQueryParams{
+	membershipQueryParams := &memberships.ListOptions{
 		RoomID:      room.ID,
 		PersonEmail: app.Email,
 	}
 
-	memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+	mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 	if err != nil {
 		log.Debugf("Error getting membership for user for room %s", webexroom)
-		log.Debugf(err.Error())
+		log.Debug(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(fmt.Sprintf("Server Error (memberships)")))
 		return
 	}
 
-	if len(memberships.Items) <= 0 {
+	if len(mbrPage.Items) <= 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(fmt.Sprintf("I am unable to add you to the room, because the configured User / Bot is not a member of the room")))
 		return
@@ -114,7 +114,7 @@ func (app *AddUserToRoomServerApplication) addUser(w http.ResponseWriter, r *htt
 	err = app.createMember(room, email(emailAddress), false)
 	if err != nil {
 		log.Debugf("Error adding user to room %s", webexroom)
-		log.Debugf(err.Error())
+		log.Debug(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(fmt.Sprintf("Unable to add user to room")))
 		return

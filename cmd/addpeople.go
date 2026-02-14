@@ -12,9 +12,11 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/tejzpr/webex-go-sdk/v2/memberships"
+	"github.com/tejzpr/webex-go-sdk/v2/people"
+	"github.com/tejzpr/webex-go-sdk/v2/rooms"
 
 	"github.com/gammazero/workerpool"
-	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
 	"github.com/urfave/cli/v2"
 )
 
@@ -137,7 +139,7 @@ func (app *Application) AddPeopleCMD() *cli.Command {
 	}
 }
 
-func (app *AddPeopleApplication) checkAccess(me *webexteams.Person, room *webexteams.Room, membership webexteams.Membership) bool {
+func (app *AddPeopleApplication) checkAccess(me *people.Person, room *rooms.Room, membership memberships.Membership) bool {
 	if app.Access == "a" {
 		return true
 	} else if app.Access == "o" {
@@ -176,19 +178,19 @@ func (app *AddPeopleApplication) AddPeopleToRoom(roomIDs []string) error {
 			rwp.Submit(func() {
 				defer rwg.Done()
 				if roomID == "" {
-					membershipQueryParams := &webexteams.ListMembershipsQueryParams{}
-					memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+					membershipQueryParams := &memberships.ListOptions{}
+					mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 					if err != nil {
 						errChan <- err
 						return
 					}
-					if len(memberships.Items) > 0 {
+					if len(mbrPage.Items) > 0 {
 						var wg sync.WaitGroup
-						for _, membership := range memberships.Items {
+						for _, membership := range mbrPage.Items {
 							wg.Add(1)
-							go func(membership webexteams.Membership) {
+							go func(membership memberships.Membership) {
 								defer wg.Done()
-								room, _, err := app.Client.Rooms.GetRoom(membership.RoomID)
+								room, err := app.Client.Rooms().Get(membership.RoomID)
 								if err != nil {
 									errChan <- err
 									return
@@ -209,24 +211,24 @@ func (app *AddPeopleApplication) AddPeopleToRoom(roomIDs []string) error {
 						wg.Wait()
 					}
 				} else {
-					room, _, err := app.Client.Rooms.GetRoom(roomID)
+					room, err := app.Client.Rooms().Get(roomID)
 					if err != nil {
 						errChan <- err
 						return
 					}
-					membershipQueryParams := &webexteams.ListMembershipsQueryParams{
+					membershipQueryParams := &memberships.ListOptions{
 						RoomID:      room.ID,
 						PersonEmail: app.Email,
 					}
 
-					memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+					mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 					if err != nil {
 						errChan <- err
 						return
 					}
 
-					if len(memberships.Items) > 0 {
-						if room.Title != "" && app.checkAccess(app.Me, room, memberships.Items[0]) {
+					if len(mbrPage.Items) > 0 {
+						if room.Title != "" && app.checkAccess(app.Me, room, mbrPage.Items[0]) {
 							err := app.processAddPeople(room)
 							if err == nil {
 								log.Println("Added members to: ", room.Title)
@@ -245,25 +247,25 @@ func (app *AddPeopleApplication) AddPeopleToRoom(roomIDs []string) error {
 	return nil
 }
 
-func (app *AddPeopleApplication) processAddPeople(room *webexteams.Room) error {
+func (app *AddPeopleApplication) processAddPeople(room *rooms.Room) error {
 
-	if room.RoomType == "direct" {
+	if room.Type == "direct" {
 		return errors.New("Cannot add new members to a 1:1 room")
 	}
 
-	membershipQueryParams := &webexteams.ListMembershipsQueryParams{
+	membershipQueryParams := &memberships.ListOptions{
 		PersonEmail: app.Email,
 		RoomID:      room.ID,
 	}
 
-	memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+	mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 	if err != nil {
 		return err
 	}
 
 	// Has membership
-	if len(memberships.Items) > 0 {
-		membershipID := memberships.Items[0].ID
+	if len(mbrPage.Items) > 0 {
+		membershipID := mbrPage.Items[0].ID
 		_ = membershipID
 		// fmt.Println("IS Moderator:", memberships.Items[0].IsModerator)
 		importPeopleCSVPath := app.PeopleCSVPath

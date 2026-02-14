@@ -13,7 +13,8 @@ import (
 	"strings"
 	"webex-teams-cli/cmd"
 
-	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
+	webex "github.com/tejzpr/webex-go-sdk/v2"
+	"github.com/tejzpr/webex-go-sdk/v2/contents"
 	"github.com/urfave/cli/v2"
 
 	log "github.com/sirupsen/logrus"
@@ -47,7 +48,7 @@ func main() {
 
 		webex-teams-cli room msg -t "message text" -f <file>
 		`,
-		Version: "v1.2-beta",
+		Version: "v2.0",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "accessToken",
@@ -66,19 +67,23 @@ func main() {
 			},
 		},
 		Commands: []*cli.Command{
+			appWebex.ChatCMD(),
 			appWebex.RoomCMD(),
 			appWebex.WebexUtils(),
 			appWebex.AddUserToRoomServer(),
 			appWebex.MessageRelayServer(),
-			appWebex.ShellCMD(),
 		},
 		Before: func(c *cli.Context) error {
 			accessToken := c.String("accessToken")
-			Client := webexteams.NewClient()
-			Client.SetAuthToken(accessToken)
+			client, err := webex.NewClient(accessToken, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create Webex client: %w", err)
+			}
 			appWebex.AccessToken = accessToken
-			appWebex.Client = Client
-			me, _, err := Client.People.GetMe()
+			appWebex.Client = client
+			appWebex.ContentsClient = contents.New(client.Core(), nil)
+
+			me, err := client.People().GetMe()
 			if err != nil {
 				return err
 			}
@@ -104,11 +109,10 @@ func main() {
 			if err != nil {
 				return err
 			}
-			if _, err := os.Stat(absFilePath); os.IsNotExist(err) {
-				os.Mkdir(absFilePath, 0766)
-			}
-			if err != nil {
-				return err
+			if _, statErr := os.Stat(absFilePath); os.IsNotExist(statErr) {
+				if mkErr := os.Mkdir(absFilePath, 0766); mkErr != nil {
+					return mkErr
+				}
 			}
 			appWebex.DownloadsDir = downloadsDir
 

@@ -9,7 +9,7 @@ func (app *Application) WebexUtils() *cli.Command {
 	return &cli.Command{
 		Name:    "utils",
 		Usage:   "Utils for Webex",
-		Aliases: []string{"utils"},
+		Aliases: []string{"u"},
 		Flags:   []cli.Flag{},
 		Subcommands: []*cli.Command{
 			app.FindRoomCMD(),

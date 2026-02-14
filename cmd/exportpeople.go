@@ -4,8 +4,8 @@ import (
 	"encoding/csv"
 	"os"
 
-	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
 	log "github.com/sirupsen/logrus"
+	"github.com/tejzpr/webex-go-sdk/v2/memberships"
 	"github.com/urfave/cli/v2"
 )
 
@@ -54,22 +54,22 @@ type ExportPeopleApplication struct {
 // Export function
 func (app *ExportPeopleApplication) Export(roomID string) error {
 
-	room, _, err := app.Client.Rooms.GetRoom(roomID)
+	room, err := app.Client.Rooms().Get(roomID)
 	if err != nil {
 		return err
 	}
 
 	log.Info(room.Title)
-	membershipQueryParams := &webexteams.ListMembershipsQueryParams{
+	membershipQueryParams := &memberships.ListOptions{
 		RoomID: room.ID,
 	}
 
-	memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+	mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 	if err != nil {
 		return err
 	}
 	log.Info(room.ID)
-	if len(memberships.Items) > 0 {
+	if len(mbrPage.Items) > 0 {
 		csvFile, err := os.Create(app.MemberCSVPath)
 		if err != nil {
 			log.Fatal(err)
@@ -80,7 +80,7 @@ func (app *ExportPeopleApplication) Export(roomID string) error {
 		defer csvWriter.Flush()
 		csvWriter.Write([]string{"email", "moderator"})
 		// Save membership to CSV file
-		for _, membership := range memberships.Items {
+		for _, membership := range mbrPage.Items {
 			moderator := "false"
 			if membership.IsModerator {
 				moderator = "true"

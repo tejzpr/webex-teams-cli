@@ -8,7 +8,7 @@ import (
 func (app *Application) RoomCMD() *cli.Command {
 	return &cli.Command{
 		Name:    "room",
-		Aliases: []string{"room"},
+		Aliases: []string{"r"},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "roomID",
@@ -33,20 +33,6 @@ func (app *Application) RoomCMD() *cli.Command {
 				Usage:    "Webex person Email to send the message to",
 				Required: false,
 				EnvVars:  []string{"WEBEX_PERSON_EMAIL"},
-			},
-			&cli.StringFlag{
-				Name:     "interactive",
-				Aliases:  []string{"i"},
-				Value:    "N",
-				Usage:    "Y/N to start an interactive session",
-				Required: false,
-			},
-			&cli.StringFlag{
-				Name:     "console",
-				Aliases:  []string{"c"},
-				Value:    "N",
-				Usage:    "Y/N to start an console based session",
-				Required: false,
 			},
 		},
 		Subcommands: []*cli.Command{

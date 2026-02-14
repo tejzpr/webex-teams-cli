@@ -14,7 +14,9 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gammazero/workerpool"
-	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
+	"github.com/tejzpr/webex-go-sdk/v2/memberships"
+	"github.com/tejzpr/webex-go-sdk/v2/people"
+	"github.com/tejzpr/webex-go-sdk/v2/rooms"
 	"github.com/urfave/cli/v2"
 )
 
@@ -149,7 +151,7 @@ func (app *Application) BroadcastToRoomsCMD() *cli.Command {
 	}
 }
 
-func (app *BroadcastToRoomsApplication) checkAccess(me *webexteams.Person, room *webexteams.Room, membership webexteams.Membership) bool {
+func (app *BroadcastToRoomsApplication) checkAccess(me *people.Person, room *rooms.Room, membership memberships.Membership) bool {
 	if app.Access == "a" {
 		return true
 	} else if app.Access == "o" {
@@ -170,7 +172,7 @@ func (app *BroadcastToRoomsApplication) checkAccess(me *webexteams.Person, room 
 
 // BroadcastToRoom function
 func (app *BroadcastToRoomsApplication) BroadcastToRoom(roomIDs []string) error {
-	me, _, err := app.Client.People.GetMe()
+	me, err := app.Client.People().GetMe()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -197,19 +199,19 @@ func (app *BroadcastToRoomsApplication) BroadcastToRoom(roomIDs []string) error 
 			rwp.Submit(func() {
 				defer rwg.Done()
 				if roomID == "" {
-					membershipQueryParams := &webexteams.ListMembershipsQueryParams{}
-					memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+					membershipQueryParams := &memberships.ListOptions{}
+					mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 					if err != nil {
 						errChan <- err
 						return
 					}
-					if len(memberships.Items) > 0 {
+					if len(mbrPage.Items) > 0 {
 						var wg sync.WaitGroup
-						for _, membership := range memberships.Items {
+						for _, membership := range mbrPage.Items {
 							wg.Add(1)
-							go func(membership webexteams.Membership) {
+							go func(membership memberships.Membership) {
 								defer wg.Done()
-								room, _, err := app.Client.Rooms.GetRoom(membership.RoomID)
+								room, err := app.Client.Rooms().Get(membership.RoomID)
 								if err != nil {
 									errChan <- err
 									return
@@ -230,24 +232,24 @@ func (app *BroadcastToRoomsApplication) BroadcastToRoom(roomIDs []string) error 
 						wg.Wait()
 					}
 				} else {
-					room, _, err := app.Client.Rooms.GetRoom(roomID)
+					room, err := app.Client.Rooms().Get(roomID)
 					if err != nil {
 						errChan <- err
 						return
 					}
-					membershipQueryParams := &webexteams.ListMembershipsQueryParams{
+					membershipQueryParams := &memberships.ListOptions{
 						RoomID:      room.ID,
 						PersonEmail: app.UserEmail,
 					}
 
-					memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+					mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 					if err != nil {
 						errChan <- err
 						return
 					}
 
-					if len(memberships.Items) > 0 {
-						if room.Title != "" && app.checkAccess(me, room, memberships.Items[0]) {
+					if len(mbrPage.Items) > 0 {
+						if room.Title != "" && app.checkAccess(me, room, mbrPage.Items[0]) {
 							err := app.sendBroadCastToRoom(room)
 							if err == nil {
 								log.Println("Message sent to: ", room.Title)
@@ -266,21 +268,21 @@ func (app *BroadcastToRoomsApplication) BroadcastToRoom(roomIDs []string) error 
 	return nil
 }
 
-func (app *BroadcastToRoomsApplication) sendBroadCastToRoom(room *webexteams.Room) error {
+func (app *BroadcastToRoomsApplication) sendBroadCastToRoom(room *rooms.Room) error {
 
-	membershipQueryParams := &webexteams.ListMembershipsQueryParams{
+	membershipQueryParams := &memberships.ListOptions{
 		PersonEmail: app.UserEmail,
 		RoomID:      room.ID,
 	}
 
-	memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+	mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 	if err != nil {
 		return err
 	}
 
 	// Has membership
-	if len(memberships.Items) > 0 {
-		membershipID := memberships.Items[0].ID
+	if len(mbrPage.Items) > 0 {
+		membershipID := mbrPage.Items[0].ID
 		_ = membershipID
 
 		params := &SendMessageParams{

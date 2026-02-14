@@ -15,7 +15,7 @@ Webex Teams CLI is a versatile tool that works via Webex Teams API to interact w
 5. Add / Remove users from Webex Teams room in bulk
 6. A message relay server than can be hosted as a microservice allowing other services to send messages to Webex Teams.
 7. Create an Onboarding Server that can onboard users via the website. 
-8. Start up a Interactive Terminal UI or a Terminal console to send / recieve files or messages from Webex Teams
+8. **Modern Chat TUI** — a two-pane terminal chat interface with room sidebar, threaded conversations, inline image viewing, file attachments, and real-time WebSocket messaging. Works over SSH.
 9. *Experimental* Start this up as a control center on a remote server and control the remote server via Webex Teams.
 10. Capability to run on many architectures including Linux x86_64, Linux Arm64, Darwin (MacOs x86_64, Arm64), Windows etc. without any external dependencies. I've tested it on Alpine Linux, Raspberry PI, MacOs, Windows.
 
@@ -191,11 +191,54 @@ webex-teams-cli shell --pes email-1@email.com,email-2@email.com --rid <roomID>
 Now you can interact with the BOT from the Webex Room. To view help send the *help* command from the Webex Room.
 To execute a command on the remote server on which the CLI is running send the command  *cmd <command and params>* from the webex room.
 
-## Use an interactive prompt
+## Interactive Chat TUI
+-----------------------------------------
+Launch a modern, full-featured terminal chat interface with a two-pane layout (sidebar + chat).
 
-Allows users to start up the CLI in an interactive mode on a remote machine and communicate to Webex from the remote machine.
+**WEBEX_ACCESS_TOKEN has to be a USER (not a BOT) token.**
+```sh
+webex-teams-cli chat
+```
 
-**WEBEX_ACCESS_TOKEN has to be a USER (not a BOT) token to use the interactive prompt.**
+![Webex Teams Chat TUI](screenshots/webex.png)
+
+### Features
+- **Two-pane layout** — persistent room sidebar on the left, chat pane on the right
+- **Room search & filter** — type `/` to search rooms, press `a`/`g`/`d` to filter by All/Group/Direct
+- **Real-time messaging** — WebSocket-based live message delivery
+- **Threaded conversations** — reply in-thread with `Ctrl+R`, thread replies are grouped and indented
+- **File attachments** — send files with `Ctrl+F` (opens a file picker), attachment filenames are resolved automatically
+- **Image viewer** — press `Ctrl+D` on an image attachment to view it inline in the terminal (halfblocks/sixel/kitty auto-detected via [go-termimg](https://github.com/blacktop/go-termimg))
+- **File download** — press `Ctrl+D` on any attachment to save it to a local directory via a directory picker
+- **Works over SSH** — no GUI required, all rendering is terminal-native
+
+### Keyboard Shortcuts
+| Key | Action |
+|---|---|
+| `Tab` | Switch between sidebar and chat pane |
+| `/` | Focus room search |
+| `a` / `g` / `d` | Filter rooms: All / Group / Direct |
+| `Enter` | Send message / Select room |
+| `Ctrl+R` | Reply in thread to selected message |
+| `Ctrl+F` | Attach a file (opens file picker) |
+| `Ctrl+D` | Download/view attachment on selected message |
+| `Ctrl+H` | Toggle help |
+| `Ctrl+C` | Quit |
+| `Esc` | Cancel reply / close overlay |
+| `↑` / `↓` | Navigate rooms or messages |
+
+### Image Viewer
+When viewing an image attachment (`Ctrl+D`), an overlay appears with the rendered image:
+- Press **`Esc`** to close the image viewer
+- Press **`s`** to save the image to a local directory
+
+### File Picker (Send / Save)
+- **Send mode** (`Ctrl+F`): navigate directories, press `Enter` to select a file to send
+- **Save mode** (`Ctrl+D` on non-image files, or `s` from image viewer): navigate to a directory, press `s` to save the file there
+
+## Legacy Interactive Prompt
+-----------------------------------------
+The legacy interactive prompt is still available:
 ```sh
 webex-teams-cli room --i true msg
 ```
@@ -207,16 +250,12 @@ To send a file via interactive prompt use the **sendfile** command
 ```
 <- (email@email.com): sendfile <file-path or URI>
 ```
-While in interactive mode the following Keyboard shortcuts are available
-* Use Crtl+H to open help pane
-* Use Crtl+R to change rooms (Lists most recent 50 rooms)
-* TAB to switch between panes
 
 ## Use run.sh to start in interactive mode
 Run the shell script run.sh and follow the prompts
 
 
-## Use an console prompt (incase system doesn't support interactive mode)
+## Console prompt (in case system doesn't support interactive mode)
 Allows users to start up the CLI in an interactive (console) mode on a remote machine and communicate to Webex from the remote machine.
 
 **WEBEX_ACCESS_TOKEN has to be a USER (not a BOT) token to use the console prompt.**

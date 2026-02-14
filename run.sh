@@ -8,8 +8,7 @@ else
   WEBEX_ACCESS_TOKEN="${WEBEX_ACCESS_TOKEN}"
 fi
 
-read -p "Email of the person to contact: " EMAIL
 
 ARCH_TYPE=`uname -m`
 
-./webex-teams-cli -a $WEBEX_ACCESS_TOKEN room --pe $EMAIL --i true msg
+./webex-teams-cli -a $WEBEX_ACCESS_TOKEN chat

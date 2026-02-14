@@ -5,25 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
 	"github.com/urfave/cli/v2"
 )
-
-func (app *Application) getRooms(max int, roomType string) ([]webexteams.Room, error) {
-	roomsQueryParams := &webexteams.ListRoomsQueryParams{
-		Max:      max,
-		TeamID:   "",
-		RoomType: roomType,
-		Paginate: false,
-		SortBy:   "lastactivity",
-	}
-
-	rooms, _, err := app.Client.Rooms.ListRooms(roomsQueryParams)
-	if err != nil {
-		return make([]webexteams.Room, 0), err
-	}
-	return rooms.Items, nil
-}
 
 // FindRoomCMD function
 func (app *Application) FindRoomCMD() *cli.Command {
@@ -47,7 +30,7 @@ func (app *Application) FindRoomCMD() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			rooms, err := app.getRooms(1000, c.String("roomType"))
+			rooms, err := app.GetRooms(1000, c.String("roomType"))
 			if err != nil {
 				return err
 			}

@@ -3,14 +3,14 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
+	"github.com/tejzpr/webex-go-sdk/v2/memberships"
 	"github.com/urfave/cli/v2"
 )
 
@@ -93,7 +93,7 @@ func (app *MessageRelayServerApplication) sendMessagePOST(w http.ResponseWriter,
 	webexroom, err := app.parseRoomID(tmproom)
 	if err != nil {
 		log.Debugf("The room %s does not valid", webexroom)
-		log.Debugf(err.Error())
+		log.Debug(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(fmt.Sprintf("Invalid Room")))
 		return
@@ -101,7 +101,7 @@ func (app *MessageRelayServerApplication) sendMessagePOST(w http.ResponseWriter,
 
 	defer r.Body.Close()
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(fmt.Sprintf("Invalid Message Body")))
@@ -116,30 +116,30 @@ func (app *MessageRelayServerApplication) sendMessagePOST(w http.ResponseWriter,
 		return
 	}
 
-	room, _, err := app.Client.Rooms.GetRoom(webexroom)
+	room, err := app.Client.Rooms().Get(webexroom)
 	if err != nil {
 		log.Debugf("The room %s does not exists", webexroom)
-		log.Debugf(err.Error())
+		log.Debug(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(fmt.Sprintf("Invalid Room")))
 		return
 	}
 
-	membershipQueryParams := &webexteams.ListMembershipsQueryParams{
+	membershipQueryParams := &memberships.ListOptions{
 		RoomID:      room.ID,
 		PersonEmail: app.Email,
 	}
 
-	memberships, _, err := app.Client.Memberships.ListMemberships(membershipQueryParams)
+	mbrPage, err := app.Client.Memberships().List(membershipQueryParams)
 	if err != nil {
 		log.Debugf("Error getting membership for user for room %s", webexroom)
-		log.Debugf(err.Error())
+		log.Debug(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(fmt.Sprintf("Server Error (memberships)")))
 		return
 	}
 
-	if len(memberships.Items) <= 0 {
+	if len(mbrPage.Items) <= 0 {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(fmt.Sprintf("I am unable to send a message to the room, because the configured User / Bot is not a member of the room")))
 		return
@@ -150,7 +150,7 @@ func (app *MessageRelayServerApplication) sendMessagePOST(w http.ResponseWriter,
 	sentMsg, err := app.SendMessage2Room(messageParams)
 	if err != nil {
 		log.Debugf("Error sending message to room %s", webexroom)
-		log.Debugf(err.Error())
+		log.Debug(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(fmt.Sprintf("I am unable to send a message to the room.")))
 		return

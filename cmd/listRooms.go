@@ -22,7 +22,7 @@ func (app *Application) ListRoomsCMD() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			rooms, err := app.getRooms(1000, c.String("roomType"))
+			rooms, err := app.GetRooms(1000, c.String("roomType"))
 			if err != nil {
 				return err
 			}

@@ -16,8 +16,7 @@ Webex Teams CLI is a versatile tool that works via Webex Teams API to interact w
 6. A message relay server than can be hosted as a microservice allowing other services to send messages to Webex Teams.
 7. Create an Onboarding Server that can onboard users via the website. 
 8. **Modern Chat TUI** — a two-pane terminal chat interface with room sidebar, threaded conversations, inline image viewing, file attachments, and real-time WebSocket messaging. Works over SSH.
-9. *Experimental* Start this up as a control center on a remote server and control the remote server via Webex Teams.
-10. Capability to run on many architectures including Linux x86_64, Linux Arm64, Darwin (MacOs x86_64, Arm64), Windows etc. without any external dependencies. I've tested it on Alpine Linux, Raspberry PI, MacOs, Windows.
+9. Capability to run on many architectures including Linux x86_64, Linux Arm64, Darwin (MacOs x86_64, Arm64), Windows etc. without any external dependencies. I've tested it on Alpine Linux, Raspberry PI, MacOs, Windows.
 
 ## The Why?
 This tool was born out of a necessity to send notifications to Webex Teams from CI/CD pipelines. Over time it has grown in capability and function therefore putting this out to the public to use / expand.
@@ -180,21 +179,6 @@ To broadcast to all rooms that you are a member of use the --access a flag
 ```sh
 webex-teams-cli room broadcast --t "message text" --access a
 ```
-## Shell command execution mode
-
-**Use this mode at your own risk. This mode allows selected users system level access to remote machines through Webex**
-
-Allows users to start up the CLI in a remote machine and then execute commands on the remote machine via Webex Teams.
-
-**WEBEX_ACCESS_TOKEN has to be a BOT (not a USER) token to use the shell command execution mode.**
-
-Add a bot to a Webex room and provide its access token to WEBEX_ACCESS_TOKEN, then run
-```sh
-webex-teams-cli shell --pes email-1@email.com,email-2@email.com --rid <roomID>  
-```
-Now you can interact with the BOT from the Webex Room. To view help send the *help* command from the Webex Room.
-To execute a command on the remote server on which the CLI is running send the command  *cmd <command and params>* from the webex room.
-
 ## Interactive Chat TUI
 -----------------------------------------
 Launch a modern, full-featured terminal chat interface with a two-pane layout (sidebar + chat).
@@ -240,36 +224,6 @@ When viewing an image attachment (`Ctrl+D`), an overlay appears with the rendere
 - **Send mode** (`Ctrl+F`): navigate directories, press `Enter` to select a file to send
 - **Save mode** (`Ctrl+D` on non-image files, or `s` from image viewer): navigate to a directory, press `s` to save the file there
 
-## Legacy Interactive Prompt
------------------------------------------
-The legacy interactive prompt is still available:
-```sh
-webex-teams-cli room --i true msg
-```
-Or to directly open a room
-```sh
-webex-teams-cli room --pe email@email.com --i true msg
-```
-To send a file via interactive prompt use the **sendfile** command
-```
-<- (email@email.com): sendfile <file-path or URI>
-```
-
-## Use run.sh to start in interactive mode
-Run the shell script run.sh and follow the prompts
-
-
-## Console prompt (in case system doesn't support interactive mode)
-Allows users to start up the CLI in an interactive (console) mode on a remote machine and communicate to Webex from the remote machine.
-
-**WEBEX_ACCESS_TOKEN has to be a USER (not a BOT) token to use the console prompt.**
-```sh
-webex-teams-cli room --pe email@email.com --c true msg
-```
-To send a file via console prompt use the **sendfile** command
-```
-<- (email@email.com): sendfile <file-path or URI>
-```
 ## Create Webex Room Onboarding Server
 Create a server which can onboard users to a Webex Teams room. The user to be added is retrieved via the header **auth_user**
 The email address of the user is constructed using a combination of auth_user & the emaildomain flag. The server's default port is **8000** and it can be changed by using the -p flag

@@ -6,9 +6,9 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/WebexCommunity/webex-go-sdk/v2/memberships"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/tejzpr/webex-go-sdk/v2/memberships"
 	"github.com/urfave/cli/v2"
 )
 

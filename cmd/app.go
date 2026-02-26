@@ -12,13 +12,13 @@ import (
 	"strings"
 	"time"
 
+	webex "github.com/WebexCommunity/webex-go-sdk/v2"
+	"github.com/WebexCommunity/webex-go-sdk/v2/contents"
+	"github.com/WebexCommunity/webex-go-sdk/v2/memberships"
+	"github.com/WebexCommunity/webex-go-sdk/v2/messages"
+	"github.com/WebexCommunity/webex-go-sdk/v2/people"
+	"github.com/WebexCommunity/webex-go-sdk/v2/rooms"
 	log "github.com/sirupsen/logrus"
-	webex "github.com/tejzpr/webex-go-sdk/v2"
-	"github.com/tejzpr/webex-go-sdk/v2/contents"
-	"github.com/tejzpr/webex-go-sdk/v2/memberships"
-	"github.com/tejzpr/webex-go-sdk/v2/messages"
-	"github.com/tejzpr/webex-go-sdk/v2/people"
-	"github.com/tejzpr/webex-go-sdk/v2/rooms"
 )
 
 // Application struct

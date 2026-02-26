@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	webex "github.com/tejzpr/webex-go-sdk/v2"
-	"github.com/tejzpr/webex-go-sdk/v2/contents"
+	webex "github.com/WebexCommunity/webex-go-sdk/v2"
+	"github.com/WebexCommunity/webex-go-sdk/v2/contents"
 )
 
 // --- SendMessage2Room validation tests ---

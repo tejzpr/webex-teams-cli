@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	webex "github.com/tejzpr/webex-go-sdk/v2"
-	"github.com/tejzpr/webex-go-sdk/v2/contents"
-	"github.com/tejzpr/webex-go-sdk/v2/messages"
-	"github.com/tejzpr/webex-go-sdk/v2/rooms"
+	webex "github.com/WebexCommunity/webex-go-sdk/v2"
+	"github.com/WebexCommunity/webex-go-sdk/v2/contents"
+	"github.com/WebexCommunity/webex-go-sdk/v2/messages"
+	"github.com/WebexCommunity/webex-go-sdk/v2/rooms"
 )
 
 // --- mock app for testing ---

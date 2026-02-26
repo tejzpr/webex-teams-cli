@@ -14,8 +14,8 @@ import (
 
 	"github.com/tejzpr/webex-teams-cli/cmd"
 
-	webex "github.com/tejzpr/webex-go-sdk/v2"
-	"github.com/tejzpr/webex-go-sdk/v2/contents"
+	webex "github.com/WebexCommunity/webex-go-sdk/v2"
+	"github.com/WebexCommunity/webex-go-sdk/v2/contents"
 	"github.com/urfave/cli/v2"
 
 	log "github.com/sirupsen/logrus"

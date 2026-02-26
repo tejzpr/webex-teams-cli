@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/tejzpr/webex-go-sdk/v2/memberships"
-	"github.com/tejzpr/webex-go-sdk/v2/people"
-	"github.com/tejzpr/webex-go-sdk/v2/rooms"
+	"github.com/WebexCommunity/webex-go-sdk/v2/memberships"
+	"github.com/WebexCommunity/webex-go-sdk/v2/people"
+	"github.com/WebexCommunity/webex-go-sdk/v2/rooms"
 )
 
 // Helper to create test data

@@ -4,15 +4,15 @@ import (
 	"os"
 	"strings"
 
+	"github.com/WebexCommunity/webex-go-sdk/v2/contents"
+	"github.com/WebexCommunity/webex-go-sdk/v2/messages"
+	"github.com/WebexCommunity/webex-go-sdk/v2/rooms"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/tejzpr/webex-go-sdk/v2/contents"
-	"github.com/tejzpr/webex-go-sdk/v2/messages"
-	"github.com/tejzpr/webex-go-sdk/v2/rooms"
 
-	webex "github.com/tejzpr/webex-go-sdk/v2"
+	webex "github.com/WebexCommunity/webex-go-sdk/v2"
 )
 
 // AppProvider is the interface the TUI needs from the application layer.

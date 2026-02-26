@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/WebexCommunity/webex-go-sdk/v2/messages"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/tejzpr/webex-go-sdk/v2/messages"
 )
 
 // loadRoomsCmd fetches the room list asynchronously

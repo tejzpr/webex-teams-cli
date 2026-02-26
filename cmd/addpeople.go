@@ -11,10 +11,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/WebexCommunity/webex-go-sdk/v2/memberships"
+	"github.com/WebexCommunity/webex-go-sdk/v2/people"
+	"github.com/WebexCommunity/webex-go-sdk/v2/rooms"
 	log "github.com/sirupsen/logrus"
-	"github.com/tejzpr/webex-go-sdk/v2/memberships"
-	"github.com/tejzpr/webex-go-sdk/v2/people"
-	"github.com/tejzpr/webex-go-sdk/v2/rooms"
 
 	"github.com/gammazero/workerpool"
 	"github.com/urfave/cli/v2"

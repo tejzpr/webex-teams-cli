@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tejzpr/webex-go-sdk/v2/people"
+	"github.com/WebexCommunity/webex-go-sdk/v2/people"
 	"github.com/urfave/cli/v2"
 )
 

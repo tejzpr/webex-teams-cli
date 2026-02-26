@@ -4,8 +4,8 @@ import (
 	"encoding/csv"
 	"os"
 
+	"github.com/WebexCommunity/webex-go-sdk/v2/memberships"
 	log "github.com/sirupsen/logrus"
-	"github.com/tejzpr/webex-go-sdk/v2/memberships"
 	"github.com/urfave/cli/v2"
 )
 
